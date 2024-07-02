@@ -26,7 +26,7 @@ from .embeddings import (
     PatchEmbed,
     PixArtAlphaTextProjection,
 )
-from .modeling_utils import ModelMixin
+from .modeling_utils import ModelMixin, get_xla_model
 from .transformers.hunyuan_transformer_2d import HunyuanDiTBlock
 
 
@@ -300,6 +300,9 @@ class HunyuanDiT2DControlNetModel(ModelMixin, ConfigMixin):
 
         # 6. scaling
         controlnet_block_res_samples = [sample * conditioning_scale for sample in controlnet_block_res_samples]
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return (controlnet_block_res_samples,)

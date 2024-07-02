@@ -43,7 +43,7 @@ from ..embeddings import (
     TimestepEmbedding,
     Timesteps,
 )
-from ..modeling_utils import ModelMixin
+from ..modeling_utils import ModelMixin, get_xla_model
 from .unet_2d_blocks import (
     get_down_block,
     get_mid_block,
@@ -1298,6 +1298,9 @@ class UNet2DConditionModel(
         if USE_PEFT_BACKEND:
             # remove `lora_scale` from each PEFT layer
             unscale_lora_layers(self, lora_scale)
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return (sample,)

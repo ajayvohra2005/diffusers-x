@@ -24,7 +24,7 @@ from ...configuration_utils import ConfigMixin, register_to_config
 from ...loaders import FromOriginalModelMixin, PeftAdapterMixin
 from ...models.attention import JointTransformerBlock
 from ...models.attention_processor import Attention, AttentionProcessor
-from ...models.modeling_utils import ModelMixin
+from ...models.modeling_utils import ModelMixin, get_xla_model
 from ...models.normalization import AdaLayerNormContinuous
 from ...utils import USE_PEFT_BACKEND, is_torch_version, logging, scale_lora_layers, unscale_lora_layers
 from ..embeddings import CombinedTimestepTextProjEmbeddings, PatchEmbed
@@ -389,6 +389,9 @@ class SD3Transformer2DModel(ModelMixin, ConfigMixin, PeftAdapterMixin, FromOrigi
         if USE_PEFT_BACKEND:
             # remove `lora_scale` from each PEFT layer
             unscale_lora_layers(self, lora_scale)
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return (output,)

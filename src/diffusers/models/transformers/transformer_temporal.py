@@ -21,7 +21,7 @@ from ...configuration_utils import ConfigMixin, register_to_config
 from ...utils import BaseOutput
 from ..attention import BasicTransformerBlock, TemporalBasicTransformerBlock
 from ..embeddings import TimestepEmbedding, Timesteps
-from ..modeling_utils import ModelMixin
+from ..modeling_utils import ModelMixin, get_xla_model
 from ..resnet import AlphaBlender
 
 
@@ -193,6 +193,9 @@ class TransformerTemporalModel(ModelMixin, ConfigMixin):
         hidden_states = hidden_states.reshape(batch_frames, channel, height, width)
 
         output = hidden_states + residual
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return (output,)
@@ -374,6 +377,9 @@ class TransformerSpatioTemporalModel(nn.Module):
         hidden_states = hidden_states.reshape(batch_frames, height, width, inner_dim).permute(0, 3, 1, 2).contiguous()
 
         output = hidden_states + residual
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return (output,)

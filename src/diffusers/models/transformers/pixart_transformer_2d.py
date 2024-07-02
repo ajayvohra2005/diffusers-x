@@ -21,7 +21,7 @@ from ...utils import is_torch_version, logging
 from ..attention import BasicTransformerBlock
 from ..embeddings import PatchEmbed, PixArtAlphaTextProjection
 from ..modeling_outputs import Transformer2DModelOutput
-from ..modeling_utils import ModelMixin
+from ..modeling_utils import ModelMixin, get_xla_model
 from ..normalization import AdaLayerNormSingle
 
 
@@ -329,6 +329,9 @@ class PixArtTransformer2DModel(ModelMixin, ConfigMixin):
         output = hidden_states.reshape(
             shape=(-1, self.out_channels, height * self.config.patch_size, width * self.config.patch_size)
         )
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return (output,)

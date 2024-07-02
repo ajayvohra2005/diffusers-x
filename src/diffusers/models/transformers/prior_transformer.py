@@ -17,7 +17,7 @@ from ..attention_processor import (
     AttnProcessor,
 )
 from ..embeddings import TimestepEmbedding, Timesteps
-from ..modeling_utils import ModelMixin
+from ..modeling_utils import ModelMixin, get_xla_model
 
 
 @dataclass
@@ -369,6 +369,9 @@ class PriorTransformer(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin, Pef
             hidden_states = hidden_states[:, additional_embeddings_len:]
 
         predicted_image_embedding = self.proj_to_clip_embeddings(hidden_states)
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return (predicted_image_embedding,)

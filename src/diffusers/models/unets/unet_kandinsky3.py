@@ -23,7 +23,7 @@ from ...configuration_utils import ConfigMixin, register_to_config
 from ...utils import BaseOutput, logging
 from ..attention_processor import Attention, AttentionProcessor, AttnProcessor
 from ..embeddings import TimestepEmbedding, Timesteps
-from ..modeling_utils import ModelMixin
+from ..modeling_utils import ModelMixin, get_xla_model
 
 
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
@@ -245,6 +245,9 @@ class Kandinsky3UNet(ModelMixin, ConfigMixin):
         sample = self.conv_norm_out(sample)
         sample = self.conv_act_out(sample)
         sample = self.conv_out(sample)
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return (sample,)

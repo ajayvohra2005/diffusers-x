@@ -30,7 +30,7 @@ from ..attention_processor import (
     AttnAddedKVProcessor,
     AttnProcessor,
 )
-from ..modeling_utils import ModelMixin
+from ..modeling_utils import ModelMixin, get_xla_model
 from ..unets.unet_2d import UNet2DModel
 from .vae import DecoderOutput, DiagonalGaussianDistribution, Encoder
 
@@ -453,6 +453,9 @@ class ConsistencyDecoderVAE(ModelMixin, ConfigMixin):
         else:
             z = posterior.mode()
         dec = self.decode(z, generator=generator).sample
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return (dec,)

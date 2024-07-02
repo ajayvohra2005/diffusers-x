@@ -14,6 +14,7 @@
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
+from diffusers.models.modeling_utils import get_xla_model
 import numpy as np
 import torch
 import torch.nn as nn
@@ -344,6 +345,9 @@ class Decoder(nn.Module):
         sample = self.conv_act(sample)
         sample = self.conv_out(sample)
 
+        if get_xla_model():
+            get_xla_model().mark_step()
+
         return sample
 
 
@@ -638,6 +642,9 @@ class MaskConditionDecoder(nn.Module):
             sample = self.conv_norm_out(sample, latent_embeds)
         sample = self.conv_act(sample)
         sample = self.conv_out(sample)
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         return sample
 

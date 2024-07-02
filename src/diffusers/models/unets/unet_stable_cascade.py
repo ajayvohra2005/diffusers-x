@@ -24,7 +24,7 @@ from ...configuration_utils import ConfigMixin, register_to_config
 from ...loaders import FromOriginalModelMixin
 from ...utils import BaseOutput
 from ..attention_processor import Attention
-from ..modeling_utils import ModelMixin
+from ..modeling_utils import ModelMixin, get_xla_model
 
 
 # Copied from diffusers.pipelines.wuerstchen.modeling_wuerstchen_common.WuerstchenLayerNorm with WuerstchenLayerNorm -> SDCascadeLayerNorm
@@ -607,6 +607,9 @@ class StableCascadeUNet(ModelMixin, ConfigMixin, FromOriginalModelMixin):
         level_outputs = self._down_encode(x, timestep_ratio_embed, clip)
         x = self._up_decode(level_outputs, timestep_ratio_embed, clip)
         sample = self.clf(x)
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return (sample,)

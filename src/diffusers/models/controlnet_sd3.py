@@ -24,7 +24,7 @@ from ..loaders import FromOriginalModelMixin, PeftAdapterMixin
 from ..models.attention import JointTransformerBlock
 from ..models.attention_processor import Attention, AttentionProcessor
 from ..models.modeling_outputs import Transformer2DModelOutput
-from ..models.modeling_utils import ModelMixin
+from ..models.modeling_utils import ModelMixin, get_xla_model
 from ..utils import USE_PEFT_BACKEND, is_torch_version, logging, scale_lora_layers, unscale_lora_layers
 from .controlnet import BaseOutput, zero_module
 from .embeddings import CombinedTimestepTextProjEmbeddings, PatchEmbed
@@ -359,6 +359,9 @@ class SD3ControlNetModel(ModelMixin, ConfigMixin, PeftAdapterMixin, FromOriginal
             # remove `lora_scale` from each PEFT layer
             unscale_lora_layers(self, lora_scale)
 
+        if get_xla_model():
+            get_xla_model().mark_step()
+
         if not return_dict:
             return (controlnet_block_res_samples,)
 
@@ -414,5 +417,8 @@ class SD3MultiControlNetModel(ModelMixin):
                     for control_block_sample, block_sample in zip(control_block_samples[0], block_samples[0])
                 ]
                 control_block_samples = (tuple(control_block_samples),)
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         return control_block_samples

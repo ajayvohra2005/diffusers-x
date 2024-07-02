@@ -21,7 +21,7 @@ import torch
 from ...configuration_utils import ConfigMixin, register_to_config
 from ...utils import BaseOutput
 from ...utils.accelerate_utils import apply_forward_hook
-from ..modeling_utils import ModelMixin
+from ..modeling_utils import ModelMixin, get_xla_model
 from .vae import DecoderOutput, DecoderTiny, EncoderTiny
 
 
@@ -342,6 +342,9 @@ class AutoencoderTiny(ModelMixin, ConfigMixin):
         unscaled_enc = self.unscale_latents(scaled_enc / 255.0)
 
         dec = self.decode(unscaled_enc)
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return (dec,)

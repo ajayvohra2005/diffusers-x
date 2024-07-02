@@ -22,7 +22,7 @@ from ...utils import deprecate, is_torch_version, logging
 from ..attention import BasicTransformerBlock
 from ..embeddings import ImagePositionalEmbeddings, PatchEmbed, PixArtAlphaTextProjection
 from ..modeling_outputs import Transformer2DModelOutput
-from ..modeling_utils import LegacyModelMixin
+from ..modeling_utils import LegacyModelMixin, get_xla_model
 from ..normalization import AdaLayerNormSingle
 
 
@@ -470,6 +470,9 @@ class Transformer2DModel(LegacyModelMixin, LegacyConfigMixin):
                 height=height,
                 width=width,
             )
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return (output,)

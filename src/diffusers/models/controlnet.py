@@ -29,7 +29,7 @@ from .attention_processor import (
     AttnProcessor,
 )
 from .embeddings import TextImageProjection, TextImageTimeEmbedding, TextTimeEmbedding, TimestepEmbedding, Timesteps
-from .modeling_utils import ModelMixin
+from .modeling_utils import ModelMixin, get_xla_model
 from .unets.unet_2d_blocks import (
     CrossAttnDownBlock2D,
     DownBlock2D,
@@ -856,6 +856,9 @@ class ControlNetModel(ModelMixin, ConfigMixin, FromOriginalModelMixin):
                 torch.mean(sample, dim=(2, 3), keepdim=True) for sample in down_block_res_samples
             ]
             mid_block_res_sample = torch.mean(mid_block_res_sample, dim=(2, 3), keepdim=True)
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return (down_block_res_samples, mid_block_res_sample)

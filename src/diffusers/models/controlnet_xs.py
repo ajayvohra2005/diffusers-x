@@ -32,7 +32,7 @@ from .attention_processor import (
 )
 from .controlnet import ControlNetConditioningEmbedding
 from .embeddings import TimestepEmbedding, Timesteps
-from .modeling_utils import ModelMixin
+from .modeling_utils import ModelMixin, get_xla_model
 from .unets.unet_2d_blocks import (
     CrossAttnDownBlock2D,
     CrossAttnUpBlock2D,
@@ -1211,6 +1211,9 @@ class UNetControlNetXSModel(ModelMixin, ConfigMixin):
         h_base = self.base_conv_norm_out(h_base)
         h_base = self.base_conv_act(h_base)
         h_base = self.base_conv_out(h_base)
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return (h_base,)

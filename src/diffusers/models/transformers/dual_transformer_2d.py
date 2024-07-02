@@ -13,6 +13,7 @@
 # limitations under the License.
 from typing import Optional
 
+from diffusers.models.modeling_utils import get_xla_model
 from torch import nn
 
 from ..modeling_outputs import Transformer2DModelOutput
@@ -149,6 +150,9 @@ class DualTransformer2DModel(nn.Module):
 
         output_states = encoded_states[0] * self.mix_ratio + encoded_states[1] * (1 - self.mix_ratio)
         output_states = output_states + input_states
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return (output_states,)

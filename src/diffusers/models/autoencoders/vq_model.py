@@ -21,7 +21,7 @@ from ...configuration_utils import ConfigMixin, register_to_config
 from ...utils import BaseOutput
 from ...utils.accelerate_utils import apply_forward_hook
 from ..autoencoders.vae import Decoder, DecoderOutput, Encoder, VectorQuantizer
-from ..modeling_utils import ModelMixin
+from ..modeling_utils import ModelMixin, get_xla_model
 
 
 @dataclass
@@ -176,6 +176,9 @@ class VQModel(ModelMixin, ConfigMixin):
 
         h = self.encode(sample).latents
         dec = self.decode(h)
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return dec.sample, dec.commit_loss

@@ -19,7 +19,7 @@ import torch.nn as nn
 from ...configuration_utils import ConfigMixin, register_to_config
 from ...utils.accelerate_utils import apply_forward_hook
 from ..modeling_outputs import AutoencoderKLOutput
-from ..modeling_utils import ModelMixin
+from ..modeling_utils import ModelMixin, get_xla_model
 from .vae import DecoderOutput, DiagonalGaussianDistribution, Encoder, MaskConditionDecoder
 
 
@@ -177,6 +177,9 @@ class AsymmetricAutoencoderKL(ModelMixin, ConfigMixin):
         else:
             z = posterior.mode()
         dec = self.decode(z, generator, sample, mask).sample
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return (dec,)

@@ -28,7 +28,7 @@ from ..embeddings import (
     PixArtAlphaTextProjection,
 )
 from ..modeling_outputs import Transformer2DModelOutput
-from ..modeling_utils import ModelMixin
+from ..modeling_utils import ModelMixin, get_xla_model
 from ..normalization import AdaLayerNormContinuous
 
 
@@ -538,6 +538,10 @@ class HunyuanDiT2DModel(ModelMixin, ConfigMixin):
         output = hidden_states.reshape(
             shape=(hidden_states.shape[0], self.out_channels, height * patch_size, width * patch_size)
         )
+
+        if get_xla_model():
+            get_xla_model().mark_step()
+
         if not return_dict:
             return (output,)
         return Transformer2DModelOutput(sample=output)

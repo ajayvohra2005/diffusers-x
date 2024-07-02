@@ -20,7 +20,7 @@ from torch import nn
 from ...configuration_utils import ConfigMixin, register_to_config
 from ..attention_processor import Attention
 from ..embeddings import get_timestep_embedding
-from ..modeling_utils import ModelMixin
+from ..modeling_utils import ModelMixin, get_xla_model
 
 
 class T5FilmDecoder(ModelMixin, ConfigMixin):
@@ -144,6 +144,10 @@ class T5FilmDecoder(ModelMixin, ConfigMixin):
         y = self.post_dropout(y)
 
         spec_out = self.spec_out(y)
+
+        if get_xla_model():
+            get_xla_model().mark_step()
+            
         return spec_out
 
 

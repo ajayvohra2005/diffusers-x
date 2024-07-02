@@ -21,7 +21,7 @@ from ...utils import is_torch_version
 from ...utils.accelerate_utils import apply_forward_hook
 from ..attention_processor import CROSS_ATTENTION_PROCESSORS, AttentionProcessor, AttnProcessor
 from ..modeling_outputs import AutoencoderKLOutput
-from ..modeling_utils import ModelMixin
+from ..modeling_utils import ModelMixin, get_xla_model
 from ..unets.unet_3d_blocks import MidBlockTemporalDecoder, UpBlockTemporalDecoder
 from .vae import DecoderOutput, DiagonalGaussianDistribution, Encoder
 
@@ -157,6 +157,9 @@ class TemporalDecoder(nn.Module):
         sample = self.time_conv_out(sample)
 
         sample = sample.permute(0, 2, 1, 3, 4).reshape(batch_frames, channels, height, width)
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         return sample
 
@@ -394,6 +397,9 @@ class AutoencoderKLTemporalDecoder(ModelMixin, ConfigMixin):
             z = posterior.mode()
 
         dec = self.decode(z, num_frames=num_frames).sample
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return (dec,)

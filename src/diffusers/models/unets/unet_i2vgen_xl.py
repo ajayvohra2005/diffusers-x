@@ -31,7 +31,7 @@ from ..attention_processor import (
     AttnProcessor,
 )
 from ..embeddings import TimestepEmbedding, Timesteps
-from ..modeling_utils import ModelMixin
+from ..modeling_utils import ModelMixin, get_xla_model
 from ..transformers.transformer_temporal import TransformerTemporalModel
 from .unet_3d_blocks import (
     CrossAttnDownBlock3D,
@@ -719,6 +719,9 @@ class I2VGenXLUNet(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin):
         # reshape to (batch, channel, framerate, width, height)
         sample = sample[None, :].reshape((-1, num_frames) + sample.shape[1:]).permute(0, 2, 1, 3, 4)
 
+        if get_xla_model():
+            get_xla_model().mark_step()
+            
         if not return_dict:
             return (sample,)
 

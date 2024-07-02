@@ -9,7 +9,7 @@ from ...loaders import UNet2DConditionLoadersMixin
 from ...utils import BaseOutput, logging
 from ..attention_processor import CROSS_ATTENTION_PROCESSORS, AttentionProcessor, AttnProcessor
 from ..embeddings import TimestepEmbedding, Timesteps
-from ..modeling_utils import ModelMixin
+from ..modeling_utils import ModelMixin, get_xla_model
 from .unet_3d_blocks import UNetMidBlockSpatioTemporal, get_down_block, get_up_block
 
 
@@ -484,6 +484,9 @@ class UNetSpatioTemporalConditionModel(ModelMixin, ConfigMixin, UNet2DConditionL
         # 7. Reshape back to original shape
         sample = sample.reshape(batch_size, num_frames, *sample.shape[1:])
 
+        if get_xla_model():
+            get_xla_model().mark_step()
+            
         if not return_dict:
             return (sample,)
 

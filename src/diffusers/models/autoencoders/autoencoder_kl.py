@@ -28,7 +28,7 @@ from ..attention_processor import (
     AttnProcessor,
 )
 from ..modeling_outputs import AutoencoderKLOutput
-from ..modeling_utils import ModelMixin
+from ..modeling_utils import ModelMixin, get_xla_model
 from .vae import Decoder, DecoderOutput, DiagonalGaussianDistribution, Encoder
 
 
@@ -454,6 +454,9 @@ class AutoencoderKL(ModelMixin, ConfigMixin, FromOriginalModelMixin):
         else:
             z = posterior.mode()
         dec = self.decode(z).sample
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return (dec,)

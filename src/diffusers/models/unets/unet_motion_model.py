@@ -33,7 +33,7 @@ from ..attention_processor import (
     IPAdapterAttnProcessor2_0,
 )
 from ..embeddings import TimestepEmbedding, Timesteps
-from ..modeling_utils import ModelMixin
+from ..modeling_utils import ModelMixin, get_xla_model
 from ..transformers.transformer_temporal import TransformerTemporalModel
 from .unet_2d_blocks import UNetMidBlock2DCrossAttn
 from .unet_2d_condition import UNet2DConditionModel
@@ -1166,6 +1166,9 @@ class UNetMotionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin):
 
         # reshape to (batch, channel, framerate, width, height)
         sample = sample[None, :].reshape((-1, num_frames) + sample.shape[1:]).permute(0, 2, 1, 3, 4)
+
+        if get_xla_model():
+            get_xla_model().mark_step()
 
         if not return_dict:
             return (sample,)

@@ -71,32 +71,6 @@ else:
     _LOW_CPU_MEM_USAGE_DEFAULT = False
 
 
-try:
-    import torch_xla.core.xla_model as xm
-except ImportError:
-    xm = None
-
-
-def get_xla_model():
-    return xm
-
-def get_current_device(local_rank=None) -> torch.device:
-    global __current_device
-
-    try:
-        return __current_device
-    except NameError:
-        if xm is not None:
-            __current_device = xm.xla_device()
-        elif torch.cuda.is_available():
-            local_rank = local_rank if local_rank is not None else int(os.getenv("LOCAL_RANK", 0))
-            __current_device = torch.device(f'cuda:{local_rank}')
-        else:
-            device = os.getenv("DEFAULT_DEVICE", "cpu")
-            __current_device = torch.device(device)
-
-    return __current_device
-
 if is_accelerate_available():
     import accelerate
 

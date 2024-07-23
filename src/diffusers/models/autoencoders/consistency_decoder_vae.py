@@ -14,6 +14,7 @@
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple, Union
 
+from diffusers.utils.import_utils import is_torch_xla_available
 import torch
 import torch.nn.functional as F
 from torch import nn
@@ -34,7 +35,13 @@ from ..modeling_utils import ModelMixin, get_xla_model
 from ..unets.unet_2d import UNet2DModel
 from .vae import DecoderOutput, DiagonalGaussianDistribution, Encoder
 
+if is_torch_xla_available():
+    import torch_xla.core.xla_model as xm
 
+    XLA_AVAILABLE = True
+else:
+    XLA_AVAILABLE = False
+    
 @dataclass
 class ConsistencyDecoderVAEOutput(BaseOutput):
     """
@@ -454,8 +461,8 @@ class ConsistencyDecoderVAE(ModelMixin, ConfigMixin):
             z = posterior.mode()
         dec = self.decode(z, generator=generator).sample
 
-        if get_xla_model():
-            get_xla_model().mark_step()
+        if XLA_AVAILABLE:
+            xm.mark_step()
 
         if not return_dict:
             return (dec,)

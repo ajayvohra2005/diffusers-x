@@ -14,6 +14,7 @@
 
 from typing import Any, Dict, Optional, Tuple, Union
 
+from diffusers.utils.import_utils import is_torch_xla_available
 import torch
 import torch.nn as nn
 import torch.utils.checkpoint
@@ -44,7 +45,13 @@ from .unet_3d_blocks import (
 )
 from .unet_3d_condition import UNet3DConditionOutput
 
+if is_torch_xla_available():
+    import torch_xla.core.xla_model as xm
 
+    XLA_AVAILABLE = True
+else:
+    XLA_AVAILABLE = False
+    
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
 
 
@@ -719,8 +726,8 @@ class I2VGenXLUNet(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin):
         # reshape to (batch, channel, framerate, width, height)
         sample = sample[None, :].reshape((-1, num_frames) + sample.shape[1:]).permute(0, 2, 1, 3, 4)
 
-        if get_xla_model():
-            get_xla_model().mark_step()
+        if XLA_AVAILABLE:
+            xm.mark_step()
             
         if not return_dict:
             return (sample,)

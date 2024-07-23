@@ -16,6 +16,7 @@
 from dataclasses import dataclass
 from typing import Optional, Tuple, Union
 
+from diffusers.utils.import_utils import is_torch_xla_available
 import torch
 
 from ...configuration_utils import ConfigMixin, register_to_config
@@ -24,7 +25,13 @@ from ...utils.accelerate_utils import apply_forward_hook
 from ..modeling_utils import ModelMixin, get_xla_model
 from .vae import DecoderOutput, DecoderTiny, EncoderTiny
 
+if is_torch_xla_available():
+    import torch_xla.core.xla_model as xm
 
+    XLA_AVAILABLE = True
+else:
+    XLA_AVAILABLE = False
+    
 @dataclass
 class AutoencoderTinyOutput(BaseOutput):
     """
@@ -343,8 +350,8 @@ class AutoencoderTiny(ModelMixin, ConfigMixin):
 
         dec = self.decode(unscaled_enc)
 
-        if get_xla_model():
-            get_xla_model().mark_step()
+        if XLA_AVAILABLE:
+            xm.mark_step()
 
         if not return_dict:
             return (dec,)

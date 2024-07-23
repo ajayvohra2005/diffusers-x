@@ -246,8 +246,8 @@ class Kandinsky3UNet(ModelMixin, ConfigMixin):
         sample = self.conv_act_out(sample)
         sample = self.conv_out(sample)
 
-        if get_xla_model():
-            get_xla_model().mark_step()
+        if XLA_AVAILABLE:
+            xm.mark_step()
 
         if not return_dict:
             return (sample,)

@@ -13,6 +13,7 @@
 # limitations under the License.
 from typing import Dict, Optional, Union
 
+from diffusers.utils.import_utils import is_torch_xla_available
 import torch
 from torch import nn
 
@@ -30,7 +31,13 @@ from ..modeling_outputs import Transformer2DModelOutput
 from ..modeling_utils import ModelMixin, get_xla_model
 from ..normalization import AdaLayerNormContinuous, FP32LayerNorm
 
+if is_torch_xla_available():
+    import torch_xla.core.xla_model as xm
 
+    XLA_AVAILABLE = True
+else:
+    XLA_AVAILABLE = False
+    
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
 
 
@@ -530,8 +537,8 @@ class HunyuanDiT2DModel(ModelMixin, ConfigMixin):
             shape=(hidden_states.shape[0], self.out_channels, height * patch_size, width * patch_size)
         )
 
-        if get_xla_model():
-            get_xla_model().mark_step()
+        if XLA_AVAILABLE:
+            xm.mark_step()
 
         if not return_dict:
             return (output,)

@@ -13,6 +13,7 @@
 # limitations under the License.
 from typing import Any, Dict, Optional
 
+from diffusers.utils.import_utils import is_torch_xla_available
 import torch
 from torch import nn
 
@@ -25,6 +26,13 @@ from ..modeling_utils import ModelMixin, get_xla_model
 from ..normalization import AdaLayerNormSingle
 
 
+if is_torch_xla_available():
+    import torch_xla.core.xla_model as xm
+
+    XLA_AVAILABLE = True
+else:
+    XLA_AVAILABLE = False
+    
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
 
 
@@ -330,8 +338,8 @@ class PixArtTransformer2DModel(ModelMixin, ConfigMixin):
             shape=(-1, self.out_channels, height * self.config.patch_size, width * self.config.patch_size)
         )
 
-        if get_xla_model():
-            get_xla_model().mark_step()
+        if XLA_AVAILABLE:
+            xm.mark_step()
 
         if not return_dict:
             return (output,)

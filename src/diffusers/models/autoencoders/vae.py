@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from typing import Optional, Tuple
 
 from diffusers.models.modeling_utils import get_xla_model
+from diffusers.utils.import_utils import is_torch_xla_available
 import numpy as np
 import torch
 import torch.nn as nn
@@ -30,6 +31,12 @@ from ..unets.unet_2d_blocks import (
     get_up_block,
 )
 
+if is_torch_xla_available():
+    import torch_xla.core.xla_model as xm
+
+    XLA_AVAILABLE = True
+else:
+    XLA_AVAILABLE = False
 
 @dataclass
 class DecoderOutput(BaseOutput):
@@ -345,8 +352,8 @@ class Decoder(nn.Module):
         sample = self.conv_act(sample)
         sample = self.conv_out(sample)
 
-        if get_xla_model():
-            get_xla_model().mark_step()
+        if XLA_AVAILABLE:
+            xm.mark_step()
 
         return sample
 
@@ -643,8 +650,8 @@ class MaskConditionDecoder(nn.Module):
         sample = self.conv_act(sample)
         sample = self.conv_out(sample)
 
-        if get_xla_model():
-            get_xla_model().mark_step()
+        if XLA_AVAILABLE:
+            xm.mark_step()
 
         return sample
 

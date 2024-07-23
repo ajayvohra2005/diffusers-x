@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, Optional, Union
 
+from diffusers.utils.import_utils import is_torch_xla_available
 import torch
 import torch.nn.functional as F
 from torch import nn
@@ -19,7 +20,13 @@ from ..attention_processor import (
 from ..embeddings import TimestepEmbedding, Timesteps
 from ..modeling_utils import ModelMixin, get_xla_model
 
+if is_torch_xla_available():
+    import torch_xla.core.xla_model as xm
 
+    XLA_AVAILABLE = True
+else:
+    XLA_AVAILABLE = False
+    
 @dataclass
 class PriorTransformerOutput(BaseOutput):
     """
@@ -370,8 +377,8 @@ class PriorTransformer(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin, Pef
 
         predicted_image_embedding = self.proj_to_clip_embeddings(hidden_states)
 
-        if get_xla_model():
-            get_xla_model().mark_step()
+        if XLA_AVAILABLE:
+            xm.mark_step()
 
         if not return_dict:
             return (predicted_image_embedding,)

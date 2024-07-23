@@ -14,12 +14,19 @@
 from typing import Optional
 
 from diffusers.models.modeling_utils import get_xla_model
+from diffusers.utils.import_utils import is_torch_xla_available
 from torch import nn
 
 from ..modeling_outputs import Transformer2DModelOutput
 from .transformer_2d import Transformer2DModel
 
+if is_torch_xla_available():
+    import torch_xla.core.xla_model as xm
 
+    XLA_AVAILABLE = True
+else:
+    XLA_AVAILABLE = False
+    
 class DualTransformer2DModel(nn.Module):
     """
     Dual transformer wrapper that combines two `Transformer2DModel`s for mixed inference.
@@ -151,8 +158,8 @@ class DualTransformer2DModel(nn.Module):
         output_states = encoded_states[0] * self.mix_ratio + encoded_states[1] * (1 - self.mix_ratio)
         output_states = output_states + input_states
 
-        if get_xla_model():
-            get_xla_model().mark_step()
+        if XLA_AVAILABLE:
+            xm.mark_step()
 
         if not return_dict:
             return (output_states,)

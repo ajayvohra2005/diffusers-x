@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple, Union
 
+from diffusers.utils.import_utils import is_torch_xla_available
 import torch
 import torch.nn as nn
 
@@ -12,7 +13,13 @@ from ..embeddings import TimestepEmbedding, Timesteps
 from ..modeling_utils import ModelMixin, get_xla_model
 from .unet_3d_blocks import UNetMidBlockSpatioTemporal, get_down_block, get_up_block
 
+if is_torch_xla_available():
+    import torch_xla.core.xla_model as xm
 
+    XLA_AVAILABLE = True
+else:
+    XLA_AVAILABLE = False
+    
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
 
 
@@ -484,8 +491,8 @@ class UNetSpatioTemporalConditionModel(ModelMixin, ConfigMixin, UNet2DConditionL
         # 7. Reshape back to original shape
         sample = sample.reshape(batch_size, num_frames, *sample.shape[1:])
 
-        if get_xla_model():
-            get_xla_model().mark_step()
+        if XLA_AVAILABLE:
+            xm.mark_step()
             
         if not return_dict:
             return (sample,)

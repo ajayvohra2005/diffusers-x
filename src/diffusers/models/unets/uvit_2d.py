@@ -15,6 +15,7 @@
 
 from typing import Dict, Union
 
+from diffusers.utils.import_utils import is_torch_xla_available
 import torch
 import torch.nn.functional as F
 from torch import nn
@@ -35,7 +36,13 @@ from ..modeling_utils import ModelMixin
 from ..normalization import GlobalResponseNorm, RMSNorm
 from ..resnet import Downsample2D, Upsample2D
 
+if is_torch_xla_available():
+    import torch_xla.core.xla_model as xm
 
+    XLA_AVAILABLE = True
+else:
+    XLA_AVAILABLE = False
+    
 class UVit2DModel(ModelMixin, ConfigMixin, PeftAdapterMixin):
     _supports_gradient_checkpointing = True
 
@@ -210,8 +217,8 @@ class UVit2DModel(ModelMixin, ConfigMixin, PeftAdapterMixin):
 
         logits = self.mlm_layer(hidden_states)
 
-        if get_xla_model():
-            get_xla_model().mark_step()
+        if XLA_AVAILABLE:
+            xm.mark_step()
             
         return logits
 

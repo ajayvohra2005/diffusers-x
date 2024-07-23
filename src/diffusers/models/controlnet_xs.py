@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from math import gcd
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+from diffusers.utils.import_utils import is_torch_xla_available
 import torch
 import torch.utils.checkpoint
 from torch import Tensor, nn
@@ -44,7 +45,13 @@ from .unets.unet_2d_blocks import (
 )
 from .unets.unet_2d_condition import UNet2DConditionModel
 
+if is_torch_xla_available():
+    import torch_xla.core.xla_model as xm
 
+    XLA_AVAILABLE = True
+else:
+    XLA_AVAILABLE = False
+    
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
 
 
@@ -1212,8 +1219,8 @@ class UNetControlNetXSModel(ModelMixin, ConfigMixin):
         h_base = self.base_conv_act(h_base)
         h_base = self.base_conv_out(h_base)
 
-        if get_xla_model():
-            get_xla_model().mark_step()
+        if XLA_AVAILABLE:
+            xm.mark_step()
 
         if not return_dict:
             return (h_base,)

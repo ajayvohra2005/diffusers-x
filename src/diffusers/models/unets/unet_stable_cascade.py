@@ -16,6 +16,7 @@ import math
 from dataclasses import dataclass
 from typing import Optional, Tuple, Union
 
+from diffusers.utils.import_utils import is_torch_xla_available
 import numpy as np
 import torch
 import torch.nn as nn
@@ -26,7 +27,13 @@ from ...utils import BaseOutput
 from ..attention_processor import Attention
 from ..modeling_utils import ModelMixin, get_xla_model
 
+if is_torch_xla_available():
+    import torch_xla.core.xla_model as xm
 
+    XLA_AVAILABLE = True
+else:
+    XLA_AVAILABLE = False
+    
 # Copied from diffusers.pipelines.wuerstchen.modeling_wuerstchen_common.WuerstchenLayerNorm with WuerstchenLayerNorm -> SDCascadeLayerNorm
 class SDCascadeLayerNorm(nn.LayerNorm):
     def __init__(self, *args, **kwargs):
@@ -606,8 +613,8 @@ class StableCascadeUNet(ModelMixin, ConfigMixin, FromOriginalModelMixin):
         x = self._up_decode(level_outputs, timestep_ratio_embed, clip)
         sample = self.clf(x)
 
-        if get_xla_model():
-            get_xla_model().mark_step()
+        if XLA_AVAILABLE:
+            xm.mark_step()
 
         if not return_dict:
             return (sample,)

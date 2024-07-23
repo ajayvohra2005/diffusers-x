@@ -13,6 +13,7 @@
 # limitations under the License.
 from typing import Dict, Optional, Tuple, Union
 
+from diffusers.utils.import_utils import is_torch_xla_available
 import torch
 import torch.nn as nn
 
@@ -31,7 +32,13 @@ from ..modeling_outputs import AutoencoderKLOutput
 from ..modeling_utils import ModelMixin, get_xla_model
 from .vae import Decoder, DecoderOutput, DiagonalGaussianDistribution, Encoder
 
+if is_torch_xla_available():
+    import torch_xla.core.xla_model as xm
 
+    XLA_AVAILABLE = True
+else:
+    XLA_AVAILABLE = False
+    
 class AutoencoderKL(ModelMixin, ConfigMixin, FromOriginalModelMixin):
     r"""
     A VAE model with KL loss for encoding images into latents and decoding latent representations into images.
@@ -463,8 +470,8 @@ class AutoencoderKL(ModelMixin, ConfigMixin, FromOriginalModelMixin):
             z = posterior.mode()
         dec = self.decode(z).sample
 
-        if get_xla_model():
-            get_xla_model().mark_step()
+        if XLA_AVAILABLE:
+            xm.mark_step()
 
         if not return_dict:
             return (dec,)

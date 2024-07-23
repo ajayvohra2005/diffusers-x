@@ -14,6 +14,7 @@
 import math
 from typing import Optional, Tuple
 
+from diffusers.utils.import_utils import is_torch_xla_available
 import torch
 from torch import nn
 
@@ -22,7 +23,13 @@ from ..attention_processor import Attention
 from ..embeddings import get_timestep_embedding
 from ..modeling_utils import ModelMixin, get_xla_model
 
+if is_torch_xla_available():
+    import torch_xla.core.xla_model as xm
 
+    XLA_AVAILABLE = True
+else:
+    XLA_AVAILABLE = False
+    
 class T5FilmDecoder(ModelMixin, ConfigMixin):
     r"""
     T5 style decoder with FiLM conditioning.
@@ -145,8 +152,8 @@ class T5FilmDecoder(ModelMixin, ConfigMixin):
 
         spec_out = self.spec_out(y)
 
-        if get_xla_model():
-            get_xla_model().mark_step()
+        if XLA_AVAILABLE:
+            xm.mark_step()
             
         return spec_out
 

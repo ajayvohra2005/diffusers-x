@@ -14,6 +14,7 @@
 from dataclasses import dataclass
 from typing import Optional, Tuple, Union
 
+from diffusers.utils.import_utils import is_torch_xla_available
 import torch
 import torch.nn as nn
 
@@ -23,6 +24,12 @@ from ...utils.accelerate_utils import apply_forward_hook
 from ..autoencoders.vae import Decoder, DecoderOutput, Encoder, VectorQuantizer
 from ..modeling_utils import ModelMixin, get_xla_model
 
+if is_torch_xla_available():
+    import torch_xla.core.xla_model as xm
+
+    XLA_AVAILABLE = True
+else:
+    XLA_AVAILABLE = False
 
 @dataclass
 class VQEncoderOutput(BaseOutput):
@@ -177,8 +184,8 @@ class VQModel(ModelMixin, ConfigMixin):
         h = self.encode(sample).latents
         dec = self.decode(h)
 
-        if get_xla_model():
-            get_xla_model().mark_step()
+        if XLA_AVAILABLE:
+            xm.mark_step()
 
         if not return_dict:
             return dec.sample, dec.commit_loss

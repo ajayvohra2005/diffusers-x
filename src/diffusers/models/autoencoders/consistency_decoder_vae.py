@@ -31,7 +31,7 @@ from ..attention_processor import (
     AttnAddedKVProcessor,
     AttnProcessor,
 )
-from ..modeling_utils import ModelMixin, get_xla_model
+from ..modeling_utils import ModelMixin
 from ..unets.unet_2d import UNet2DModel
 from .vae import DecoderOutput, DiagonalGaussianDistribution, Encoder
 

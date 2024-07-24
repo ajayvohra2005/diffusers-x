@@ -27,7 +27,7 @@ from .embeddings import (
     PatchEmbed,
     PixArtAlphaTextProjection,
 )
-from .modeling_utils import ModelMixin, get_xla_model
+from .modeling_utils import ModelMixin
 from .transformers.hunyuan_transformer_2d import HunyuanDiTBlock
 
 if is_torch_xla_available():

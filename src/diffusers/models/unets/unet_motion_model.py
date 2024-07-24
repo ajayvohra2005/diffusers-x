@@ -34,7 +34,7 @@ from ..attention_processor import (
     IPAdapterAttnProcessor2_0,
 )
 from ..embeddings import TimestepEmbedding, Timesteps
-from ..modeling_utils import ModelMixin, get_xla_model
+from ..modeling_utils import ModelMixin
 from ..transformers.transformer_temporal import TransformerTemporalModel
 from .unet_2d_blocks import UNetMidBlock2DCrossAttn
 from .unet_2d_condition import UNet2DConditionModel

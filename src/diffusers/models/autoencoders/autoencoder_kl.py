@@ -29,7 +29,7 @@ from ..attention_processor import (
     AttnProcessor,
 )
 from ..modeling_outputs import AutoencoderKLOutput
-from ..modeling_utils import ModelMixin, get_xla_model
+from ..modeling_utils import ModelMixin
 from .vae import Decoder, DecoderOutput, DiagonalGaussianDistribution, Encoder
 
 if is_torch_xla_available():

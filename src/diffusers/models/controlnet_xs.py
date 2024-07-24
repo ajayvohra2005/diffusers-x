@@ -33,7 +33,7 @@ from .attention_processor import (
 )
 from .controlnet import ControlNetConditioningEmbedding
 from .embeddings import TimestepEmbedding, Timesteps
-from .modeling_utils import ModelMixin, get_xla_model
+from .modeling_utils import ModelMixin
 from .unets.unet_2d_blocks import (
     CrossAttnDownBlock2D,
     CrossAttnUpBlock2D,

@@ -44,7 +44,7 @@ from ..embeddings import (
     TimestepEmbedding,
     Timesteps,
 )
-from ..modeling_utils import ModelMixin, get_xla_model
+from ..modeling_utils import ModelMixin
 from .unet_2d_blocks import (
     get_down_block,
     get_mid_block,

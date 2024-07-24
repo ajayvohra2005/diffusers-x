@@ -30,7 +30,7 @@ from .attention_processor import (
     AttnProcessor,
 )
 from .embeddings import TextImageProjection, TextImageTimeEmbedding, TextTimeEmbedding, TimestepEmbedding, Timesteps
-from .modeling_utils import ModelMixin, get_xla_model
+from .modeling_utils import ModelMixin
 from .unets.unet_2d_blocks import (
     CrossAttnDownBlock2D,
     DownBlock2D,

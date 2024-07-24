@@ -28,7 +28,7 @@ from ..embeddings import (
     PixArtAlphaTextProjection,
 )
 from ..modeling_outputs import Transformer2DModelOutput
-from ..modeling_utils import ModelMixin, get_xla_model
+from ..modeling_utils import ModelMixin
 from ..normalization import AdaLayerNormContinuous, FP32LayerNorm
 
 if is_torch_xla_available():

@@ -14,7 +14,6 @@
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
-from diffusers.models.modeling_utils import get_xla_model
 from diffusers.utils.import_utils import is_torch_xla_available
 import numpy as np
 import torch

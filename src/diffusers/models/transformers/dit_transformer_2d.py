@@ -23,7 +23,7 @@ from ...utils import is_torch_version, logging
 from ..attention import BasicTransformerBlock
 from ..embeddings import PatchEmbed
 from ..modeling_outputs import Transformer2DModelOutput
-from ..modeling_utils import ModelMixin, get_xla_model
+from ..modeling_utils import ModelMixin
 
 if is_torch_xla_available():
     import torch_xla.core.xla_model as xm

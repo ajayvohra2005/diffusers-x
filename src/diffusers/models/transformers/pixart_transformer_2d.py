@@ -22,7 +22,7 @@ from ...utils import is_torch_version, logging
 from ..attention import BasicTransformerBlock
 from ..embeddings import PatchEmbed, PixArtAlphaTextProjection
 from ..modeling_outputs import Transformer2DModelOutput
-from ..modeling_utils import ModelMixin, get_xla_model
+from ..modeling_utils import ModelMixin
 from ..normalization import AdaLayerNormSingle
 
 

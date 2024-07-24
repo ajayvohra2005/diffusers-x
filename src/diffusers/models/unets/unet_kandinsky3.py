@@ -23,7 +23,7 @@ from ...configuration_utils import ConfigMixin, register_to_config
 from ...utils import BaseOutput, logging
 from ..attention_processor import Attention, AttentionProcessor, AttnProcessor
 from ..embeddings import TimestepEmbedding, Timesteps
-from ..modeling_utils import ModelMixin, get_xla_model
+from ..modeling_utils import ModelMixin
 
 
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name

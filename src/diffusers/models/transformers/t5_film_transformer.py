@@ -21,7 +21,7 @@ from torch import nn
 from ...configuration_utils import ConfigMixin, register_to_config
 from ..attention_processor import Attention
 from ..embeddings import get_timestep_embedding
-from ..modeling_utils import ModelMixin, get_xla_model
+from ..modeling_utils import ModelMixin
 
 if is_torch_xla_available():
     import torch_xla.core.xla_model as xm

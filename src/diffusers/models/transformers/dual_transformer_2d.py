@@ -13,7 +13,6 @@
 # limitations under the License.
 from typing import Optional
 
-from diffusers.models.modeling_utils import get_xla_model
 from diffusers.utils.import_utils import is_torch_xla_available
 from torch import nn
 

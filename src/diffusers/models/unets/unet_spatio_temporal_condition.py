@@ -10,7 +10,7 @@ from ...loaders import UNet2DConditionLoadersMixin
 from ...utils import BaseOutput, logging
 from ..attention_processor import CROSS_ATTENTION_PROCESSORS, AttentionProcessor, AttnProcessor
 from ..embeddings import TimestepEmbedding, Timesteps
-from ..modeling_utils import ModelMixin, get_xla_model
+from ..modeling_utils import ModelMixin
 from .unet_3d_blocks import UNetMidBlockSpatioTemporal, get_down_block, get_up_block
 
 if is_torch_xla_available():

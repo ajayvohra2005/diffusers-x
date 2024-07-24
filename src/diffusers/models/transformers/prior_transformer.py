@@ -18,7 +18,7 @@ from ..attention_processor import (
     AttnProcessor,
 )
 from ..embeddings import TimestepEmbedding, Timesteps
-from ..modeling_utils import ModelMixin, get_xla_model
+from ..modeling_utils import ModelMixin
 
 if is_torch_xla_available():
     import torch_xla.core.xla_model as xm

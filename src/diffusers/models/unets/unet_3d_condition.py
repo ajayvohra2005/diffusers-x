@@ -34,7 +34,7 @@ from ..attention_processor import (
     AttnProcessor,
 )
 from ..embeddings import TimestepEmbedding, Timesteps
-from ..modeling_utils import ModelMixin, get_xla_model
+from ..modeling_utils import ModelMixin
 from ..transformers.transformer_temporal import TransformerTemporalModel
 from .unet_3d_blocks import (
     CrossAttnDownBlock3D,

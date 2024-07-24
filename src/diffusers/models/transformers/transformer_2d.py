@@ -23,7 +23,7 @@ from ...utils import deprecate, is_torch_version, logging
 from ..attention import BasicTransformerBlock
 from ..embeddings import ImagePositionalEmbeddings, PatchEmbed, PixArtAlphaTextProjection
 from ..modeling_outputs import Transformer2DModelOutput
-from ..modeling_utils import LegacyModelMixin, get_xla_model
+from ..modeling_utils import LegacyModelMixin
 from ..normalization import AdaLayerNormSingle
 
 if is_torch_xla_available():

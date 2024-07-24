@@ -22,7 +22,7 @@ from ...configuration_utils import ConfigMixin, register_to_config
 from ...utils import BaseOutput
 from ...utils.accelerate_utils import apply_forward_hook
 from ..autoencoders.vae import Decoder, DecoderOutput, Encoder, VectorQuantizer
-from ..modeling_utils import ModelMixin, get_xla_model
+from ..modeling_utils import ModelMixin
 
 if is_torch_xla_available():
     import torch_xla.core.xla_model as xm
